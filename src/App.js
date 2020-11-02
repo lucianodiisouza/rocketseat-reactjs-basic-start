@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import api from "./services/api";
+
+import Header from "./components/Header";
 
 function App() {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    api.get("projects").then((res) => {
+      setProjects(res.data);
+    });
+  }, []);
+
+  async function handleAddProject() {
+    const res = await api.post("projects", {
+      title: `Novo Projeto ${Date.now()}`,
+      owner: "Luciano dii Souza",
+    });
+
+    const project = res.data;
+
+    setProjects([...projects, project]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header title="React JS" />
+      <ul>
+        {projects.map((project) => (
+          <li key={project.id}>{project.title}</li>
+        ))}
+      </ul>
+
+      <button type="button" onClick={handleAddProject}>
+        Adicionar Projeto
+      </button>
+    </>
   );
 }
 
